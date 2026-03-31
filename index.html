@@ -3,73 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avaliação Monitorada - Sistema de Teste</title>
+    <title>Sistema de Avaliação Monitorada</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #673ab7; overflow: hidden; }
-        #header { background: #ffffff; color: #673ab7; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); position: relative; z-index: 10; font-weight: bold; }
-        .timer-container { display: flex; align-items: center; gap: 20px; }
-        .timer-box { font-size: 22px; background: #673ab7; color: white; padding: 5px 15px; border-radius: 8px; min-width: 80px; text-align: center; }
-        #form-container { height: calc(100vh - 60px); width: 100%; border: none; background: #f0ebf8; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #673ab7; overflow: hidden; }
         
-        /* Tela de Bloqueio */
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(220, 20, 60, 0.98); color: white; z-index: 1000; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
-        #overlay h1 { font-size: 40px; margin-bottom: 10px; }
-        #overlay p { font-size: 20px; }
-        #overlay button { background: white; color: crimson; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; margin-top: 30px; transition: 0.3s; }
-        #overlay button:hover { background: #eee; transform: scale(1.05); }
+        /* Cabeçalho */
+        #header { 
+            background: #ffffff; 
+            color: #673ab7; 
+            padding: 10px 25px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+            position: relative; 
+            z-index: 10; 
+            font-weight: bold; 
+        }
+
+        .controls { display: flex; align-items: center; gap: 15px; }
+
+        /* Estilo dos Botões */
+        .btn { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            text-transform: uppercase;
+            transition: 0.3s; 
+        }
+        .btn-next { background: #ff9800; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .btn-next:hover { background: #e68900; transform: translateY(-1px); }
+        
+        .btn-finish { background: #4caf50; color: white; display: none; }
+        .btn-finish:hover { background: #45a049; }
+
+        .timer-box { 
+            font-size: 24px; 
+            background: #673ab7; 
+            color: white; 
+            padding: 6px 18px; 
+            border-radius: 8px; 
+            min-width: 90px; 
+            text-align: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Container do Formulário */
+        #form-container { 
+            height: calc(100vh - 65px); 
+            width: 100%; 
+            border: none; 
+            background: #f0ebf8; 
+        }
+        
+        /* Overlays (Bloqueio e Fim) */
+        #overlay, #final-screen { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            z-index: 1000; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 20px; 
+        }
+        #overlay { background: rgba(220, 20, 60, 0.98); color: white; }
+        #final-screen { background: white; color: #673ab7; }
+        
+        .btn-voltar { 
+            background: white; 
+            color: crimson; 
+            border: none; 
+            padding: 15px 45px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            margin-top: 30px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
 
 <div id="header">
-    <div id="status-teste">⏳ TESTE EM ANDAMENTO</div>
-    <div class="timer-container">
-        <span id="label-secao">SEÇÃO 1 (60 min)</span>
+    <div id="status-teste">📝 TESTE 1: EM ANDAMENTO</div>
+    <div class="controls">
+        <button id="btn-trocar" class="btn btn-next" onclick="irParaMemoria()">Ir para Teste de MEMÓRIA E ATENÇÃO</button>
+        <button id="btn-finalizar" class="btn btn-finish" onclick="finalizarTudo()">FINALIZAR TUDO</button>
         <div class="timer-box" id="timer">60:00</div>
     </div>
 </div>
 
 <div id="overlay">
     <h1>⚠️ ATENÇÃO!</h1>
-    <p>Você saiu da aba do teste ou minimizou a janela.<br>Esta ação foi registrada e o tempo continua correndo!</p>
-    <button onclick="voltarAoTeste()">CLIQUE AQUI PARA VOLTAR AO TESTE</button>
+    <p style="font-size: 22px;">Você tentou sair da aba ou minimizar a janela.<br>Isso é estritamente proibido durante a avaliação.</p>
+    <button class="btn-voltar" onclick="voltarAoTeste()">RETORNAR AO TESTE AGORA</button>
 </div>
 
-<iframe id="form-container" src="https://forms.gle/x32wdwNymrpzetDA6"></iframe>
+<div id="final-screen">
+    <h1 style="font-size: 45px;">✅ Avaliação Finalizada!</h1>
+    <p style="font-size: 20px;">Seus dados e tempos foram registrados com sucesso.</p>
+    <p>Você já pode fechar esta janela com segurança.</p>
+</div>
+
+<iframe id="iframe-forms" src="https://forms.gle/x32wdwNymrpzetDA6"></iframe>
 
 <script>
-    let tempoTotalSegundos = 3600; // Começa com 1 hora (Seção 1)
-    let secaoAtual = 1;
+    let tempoRestante = 3600; // 60 minutos em segundos
+    let testeAtivo = true;
+    let timerInterval;
+
     const timerDisplay = document.getElementById('timer');
-    const labelSecao = document.getElementById('label-secao');
+    const iframe = document.getElementById('iframe-forms');
     const overlay = document.getElementById('overlay');
 
-    // Intervalo do Cronômetro
-    const contador = setInterval(() => {
-        let minutos = Math.floor(tempoTotalSegundos / 60);
-        let segundos = tempoTotalSegundos % 60;
-        timerDisplay.innerText = `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+    // Inicializa o cronômetro
+    function iniciarCronometro() {
+        timerInterval = setInterval(() => {
+            if (!testeAtivo) return;
 
-        if (tempoTotalSegundos <= 0) {
-            if (secaoAtual === 1) {
-                // Passa para os 30 min da Seção 2 automaticamente
-                secaoAtual = 2;
-                tempoTotalSegundos = 1800; 
-                labelSecao.innerText = "SEÇÃO 2 (30 min)";
-                alert("O TEMPO DA SEÇÃO 1 ACABOU! Prossiga para a próxima parte no formulário.");
-            } else {
-                clearInterval(contador);
-                document.getElementById('form-container').style.display = 'none';
-                document.getElementById('status-teste').innerText = "❌ TEMPO ESGOTADO";
-                alert("O tempo total de 1h30min acabou. O formulário foi encerrado.");
+            let min = Math.floor(tempoRestante / 60);
+            let seg = tempoRestante % 60;
+            timerDisplay.innerText = `${min}:${seg < 10 ? '0' + seg : seg}`;
+
+            if (tempoRestante <= 0) {
+                alert("O tempo para este teste expirou!");
+                if (document.getElementById('btn-trocar').style.display !== 'none') {
+                    irParaMemoria();
+                } else {
+                    finalizarTudo();
+                }
             }
-        }
-        tempoTotalSegundos--;
-    }, 1000);
+            tempoRestante--;
+        }, 1000);
+    }
 
-    // Detectar mudança de aba (Bloqueio)
+    // Função para trocar para o segundo formulário
+    function irParaMemoria() {
+        const confirmar = confirm("Deseja encerrar o Teste 1 e iniciar o Teste de MEMÓRIA E ATENÇÃO agora?\nO tempo será resetado para 30 minutos.");
+        
+        if (confirmar) {
+            // Troca o link do formulário
+            iframe.src = "https://forms.gle/gHVj3STXb8NWsWfV9";
+            
+            // Ajusta o tempo e a interface
+            tempoRestante = 1800; // 30 minutos
+            document.getElementById('status-teste').innerText = "🧠 TESTE 2: MEMÓRIA E ATENÇÃO";
+            document.getElementById('btn-trocar').style.display = 'none';
+            document.getElementById('btn-finalizar').style.display = 'block';
+        }
+    }
+
+    // Função para encerrar tudo
+    function finalizarTudo() {
+        testeAtivo = false;
+        clearInterval(timerInterval);
+        document.getElementById('header').style.display = 'none';
+        iframe.style.display = 'none';
+        document.getElementById('final-screen').style.display = 'flex';
+    }
+
+    // Monitor de mudança de aba
     document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
+        if (document.hidden && testeAtivo) {
             overlay.style.display = 'flex';
         }
     });
@@ -78,9 +179,13 @@
         overlay.style.display = 'none';
     }
 
-    // Bloqueios básicos de segurança
-    window.onbeforeunload = function() { return "Você tem certeza que deseja sair? Seu progresso será perdido."; };
-    document.addEventListener('contextmenu', e => e.preventDefault()); // Bloqueia botão direito
+    // Prevenção de fechamento acidental
+    window.onbeforeunload = function() {
+        if (testeAtivo) return "O teste ainda está em andamento. Deseja realmente sair?";
+    };
+
+    // Inicia ao carregar a página
+    iniciarCronometro();
 </script>
 
 </body>
