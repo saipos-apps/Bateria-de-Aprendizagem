@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliação Monitorada - Sistema de Teste</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #673ab7; overflow: hidden; }
+        #header { background: #ffffff; color: #673ab7; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); position: relative; z-index: 10; font-weight: bold; }
+        .timer-container { display: flex; align-items: center; gap: 20px; }
+        .timer-box { font-size: 22px; background: #673ab7; color: white; padding: 5px 15px; border-radius: 8px; min-width: 80px; text-align: center; }
+        #form-container { height: calc(100vh - 60px); width: 100%; border: none; background: #f0ebf8; }
+        
+        /* Tela de Bloqueio */
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(220, 20, 60, 0.98); color: white; z-index: 1000; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        #overlay h1 { font-size: 40px; margin-bottom: 10px; }
+        #overlay p { font-size: 20px; }
+        #overlay button { background: white; color: crimson; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; margin-top: 30px; transition: 0.3s; }
+        #overlay button:hover { background: #eee; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+<div id="header">
+    <div id="status-teste">⏳ TESTE EM ANDAMENTO</div>
+    <div class="timer-container">
+        <span id="label-secao">SEÇÃO 1 (60 min)</span>
+        <div class="timer-box" id="timer">60:00</div>
+    </div>
+</div>
+
+<div id="overlay">
+    <h1>⚠️ ATENÇÃO!</h1>
+    <p>Você saiu da aba do teste ou minimizou a janela.<br>Esta ação foi registrada e o tempo continua correndo!</p>
+    <button onclick="voltarAoTeste()">CLIQUE AQUI PARA VOLTAR AO TESTE</button>
+</div>
+
+<iframe id="form-container" src="https://forms.gle/x32wdwNymrpzetDA6"></iframe>
+
+<script>
+    let tempoTotalSegundos = 3600; // Começa com 1 hora (Seção 1)
+    let secaoAtual = 1;
+    const timerDisplay = document.getElementById('timer');
+    const labelSecao = document.getElementById('label-secao');
+    const overlay = document.getElementById('overlay');
+
+    // Intervalo do Cronômetro
+    const contador = setInterval(() => {
+        let minutos = Math.floor(tempoTotalSegundos / 60);
+        let segundos = tempoTotalSegundos % 60;
+        timerDisplay.innerText = `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+
+        if (tempoTotalSegundos <= 0) {
+            if (secaoAtual === 1) {
+                // Passa para os 30 min da Seção 2 automaticamente
+                secaoAtual = 2;
+                tempoTotalSegundos = 1800; 
+                labelSecao.innerText = "SEÇÃO 2 (30 min)";
+                alert("O TEMPO DA SEÇÃO 1 ACABOU! Prossiga para a próxima parte no formulário.");
+            } else {
+                clearInterval(contador);
+                document.getElementById('form-container').style.display = 'none';
+                document.getElementById('status-teste').innerText = "❌ TEMPO ESGOTADO";
+                alert("O tempo total de 1h30min acabou. O formulário foi encerrado.");
+            }
+        }
+        tempoTotalSegundos--;
+    }, 1000);
+
+    // Detectar mudança de aba (Bloqueio)
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            overlay.style.display = 'flex';
+        }
+    });
+
+    function voltarAoTeste() {
+        overlay.style.display = 'none';
+    }
+
+    // Bloqueios básicos de segurança
+    window.onbeforeunload = function() { return "Você tem certeza que deseja sair? Seu progresso será perdido."; };
+    document.addEventListener('contextmenu', e => e.preventDefault()); // Bloqueia botão direito
+</script>
+
+</body>
+</html>
